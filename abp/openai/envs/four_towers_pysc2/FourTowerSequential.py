@@ -9,7 +9,7 @@ import datetime
 import time
 import sys
 import numpy as np
-import pandas as pd 
+import pandas as pd
 import csv
 import json
 import visdom
@@ -36,7 +36,7 @@ class FourTowerSequential():
           map_name="FourTowerSequentialDecomposed",
           players=[sc2_env.Agent(sc2_env.Race.terran)],
           agent_interface_format=features.AgentInterfaceFormat(
-              feature_dimensions=features.Dimensions(screen=84, minimap=64),
+              feature_dimensions=features.Dimensions(screen=40, minimap=30),
               # rgb_dimensions=features.Dimensions(screen=84, minimap=64),
               # action_space=actions.ActionSpace.FEATURES,
               use_feature_units=True),
@@ -81,7 +81,9 @@ class FourTowerSequential():
         self.current_obs = observation
         state = self.int_map_to_onehot(state)
         state = np.array(state)
-        self.actions_taken = 0 
+        self.actions_taken = 0
+        state = observation[3]['feature_screen']
+        state = np.reshape(state, (1, -1))
         return state
 
     def noop(self):
@@ -97,11 +99,11 @@ class FourTowerSequential():
             if action == 0:
                 action = actions.FUNCTIONS.Attack_screen("now", [0,0])
             elif action == 1:
-                action = actions.FUNCTIONS.Attack_screen("now", [83,0])
+                action = actions.FUNCTIONS.Attack_screen("now", [39,0])
             elif action == 2:
-                action = actions.FUNCTIONS.Attack_screen("now", [0,83])
+                action = actions.FUNCTIONS.Attack_screen("now", [0,39])
             elif action == 3:
-                action = actions.FUNCTIONS.Attack_screen("now", [83,83])
+                action = actions.FUNCTIONS.Attack_screen("now", [39,39])
             elif action == 4:
                 action = actions.FUNCTIONS.no_op()
             else:
@@ -139,7 +141,7 @@ class FourTowerSequential():
             if x.unit_type == 1922:
                 roach_reward = x.health
             if x.unit_type == 1923:
-                zergling_reward = x.health 
+                zergling_reward = x.health
             if x.unit_type == 1924:
                 damageByRoach = x.health
             if x.unit_type == 1925:
@@ -171,7 +173,11 @@ class FourTowerSequential():
         self.decomposed_rewards.append([roach_reward - 2, zergling_reward - 2, damageByRoach - 2, damageByZergling - 2, damageToRoach - 2, damageToZergling - 2])
 
         ###########################################
-
+        state = observation[3]['feature_screen']
+        state = np.reshape(state, (1, -1))
+        #print('STATE SHAPE')
+        #print(state.shape)
+        #print(state.type)
         return state, reward, done, dead, info
 
     def render(self):
@@ -180,7 +186,7 @@ class FourTowerSequential():
 
         obs_image = imutil.show(self.last_timestep.observation['rgb_screen'], filename="test.jpg")
         opts = dict(title = "state", width = 360, height = 350)
-        
+
         if self.image_window is None:
             self.image_window = self.vis.image(obs_image, opts = opts)
         else:
@@ -199,8 +205,8 @@ class FourTowerSequential():
     def get_vespene_gas_count(self, obs):
         return 0
 
-    def unpack_timestep(self, timestep):  
-        observation = timestep 
+    def unpack_timestep(self, timestep):
+        observation = timestep
         state = timestep.observation.feature_screen[6]
         reward = timestep.observation.score_cumulative[0]
         done = timestep.last()
