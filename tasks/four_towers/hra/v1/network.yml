@@ -2,33 +2,43 @@
 networks:
   - name: "roach"
     layers:
-        - 250
+        - type: "FC"
+          neurons: 250
 
   - name: "zergling"
     layers:
-        - 250
+        - type: "FC"
+          neurons: 250
+
 
   - name: "damageByRoach"
     layers:
-        - 250
+        - type: "FC"
+          neurons: 250
+
 
   - name: "damageByZergling"
     layers:
-        - 250
+        - type: "FC"
+          neurons: 250
+
         
   - name: "damageToRoach"
     layers:
-        - 250
+        - type: "FC"
+          neurons: 250
+
 
   - name: "damageToZergling"
     layers:
-        - 250
+        - type: "FC"
+          neurons: 250
+
 
 input_shape:
-    - 8
+    - 27200
 
-output_shape:
-     - 4
+output_shape: 4
 
 shared_layers: [] #TODO
 aggeregator: "average" #TODO
