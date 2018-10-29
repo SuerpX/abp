@@ -2,33 +2,38 @@
 networks:
   - name: "damageToZealot"
     layers:
-        - 250
+      - type: "FC"
+        neurons: 250
 
   - name: "damageToZergling"
     layers:
-        - 250
+      - type: "FC"
+        neurons: 250
 
   - name: "damageToRoach"
     layers:
-        - 250
+      - type: "FC"
+        neurons: 250
 
   - name: "damageToStalker"
     layers:
-        - 250
+      - type: "FC"
+        neurons: 250
 
   - name: "damageToMarine"
     layers:
-        - 250
+      - type: "FC"
+        neurons: 250
 
   - name: "damageToHydralisk"
     layers:
-        - 250
+      - type: "FC"
+        neurons: 250
 
 input_shape:
-    - 36
+    - 27200
 
-output_shape:
-     - 4
+output_shape: 4
 
 shared_layers: [] #TODO
 aggeregator: "average" #TODO
