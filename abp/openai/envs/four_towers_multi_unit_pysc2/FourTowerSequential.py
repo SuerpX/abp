@@ -9,10 +9,9 @@ import datetime
 import time
 import sys
 import numpy as np
-import pandas as pd 
+import pandas as pd
 import csv
 import json
-import imutil
 
 import numpy as np
 import pysc2
@@ -35,7 +34,7 @@ class FourTowerSequentialMultiUnit():
           map_name="FourTowerSequentialDecomposedFourUnitsRandomComp",
           players=[sc2_env.Agent(sc2_env.Race.terran)],
           agent_interface_format=features.AgentInterfaceFormat(
-              feature_dimensions=features.Dimensions(screen=84, minimap=64),
+              feature_dimensions=features.Dimensions(screen=40, minimap=30),
               # rgb_dimensions=features.Dimensions(screen=640, minimap=640),
               action_space=actions.ActionSpace.FEATURES,
               ),
@@ -79,7 +78,7 @@ class FourTowerSequentialMultiUnit():
         self.current_obs = observation
         state = self.int_map_to_onehot(state)
         state = np.array(state)
-        self.actions_taken = 0 
+        self.actions_taken = 0
         from s2clientprotocol import sc2api_pb2 as sc_pb
 
 
@@ -175,6 +174,8 @@ class FourTowerSequentialMultiUnit():
                 losses = x.health
                 rewards.append(x.health)
                 unit_types.append(x.unit_type)
+        state = observation[3]['feature_screen']
+        state = np.reshape(state, (1, -1))
         return state
 
     def noop(self):
@@ -190,11 +191,11 @@ class FourTowerSequentialMultiUnit():
             if action == 0:
                 action = actions.FUNCTIONS.Attack_screen("now", [0,0])
             elif action == 1:
-                action = actions.FUNCTIONS.Attack_screen("now", [83,0])
+                action = actions.FUNCTIONS.Attack_screen("now", [39,0])
             elif action == 2:
-                action = actions.FUNCTIONS.Attack_screen("now", [0,83])
+                action = actions.FUNCTIONS.Attack_screen("now", [0,39])
             elif action == 3:
-                action = actions.FUNCTIONS.Attack_screen("now", [83,83])
+                action = actions.FUNCTIONS.Attack_screen("now", [39,39])
             elif action == 4:
                 action = actions.FUNCTIONS.no_op()
             else:
@@ -316,8 +317,6 @@ class FourTowerSequentialMultiUnit():
         # print(len(unit_types))
         # print("#################")
 
-        # THIS PRINTS OUT A RENDERED IMAGE
-        # imutil.show(self.last_timestep.observation['rgb_screen'], filename="test.jpg")
 
         # print("Damage by roach: {}".format(damageByRoach))
         # print("Damage by zergling: {}".format(damageByZergling))
@@ -357,6 +356,10 @@ class FourTowerSequentialMultiUnit():
             for x in range(current_len_state, 36):
                 state.append(0.0)
         # print(len(state))
+        state = observation[3]['feature_screen']
+        state = np.reshape(state, (1, -1))
+        # print('STATE SHAPE')
+        # print(state.shape)
         return state, reward, done, dead, info
 
     def register_map(self, map_dir, map_name):
@@ -372,8 +375,8 @@ class FourTowerSequentialMultiUnit():
     def get_vespene_gas_count(self, obs):
         return 0
 
-    def unpack_timestep(self, timestep):  
-        observation = timestep 
+    def unpack_timestep(self, timestep):
+        observation = timestep
         state = timestep.observation.feature_screen[6]
         reward = timestep.observation.score_cumulative[0]
         done = timestep.last()
