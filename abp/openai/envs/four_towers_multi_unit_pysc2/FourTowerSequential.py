@@ -78,6 +78,7 @@ class FourTowerSequentialMultiUnit():
         self.current_obs = observation
         state = self.int_map_to_onehot(state)
         state = np.array(state)
+ #       print(state.shape)
         self.actions_taken = 0
         from s2clientprotocol import sc2api_pb2 as sc_pb
 
@@ -358,8 +359,8 @@ class FourTowerSequentialMultiUnit():
         # print(len(state))
         state = observation[3]['feature_screen']
         state = np.reshape(state, (1, -1))
-        # print('STATE SHAPE')
-        # print(state.shape)
+        #print('STATE SHAPE')
+        #print(state.shape)
         return state, reward, done, dead, info
 
     def register_map(self, map_dir, map_name):

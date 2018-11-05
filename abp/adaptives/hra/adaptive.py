@@ -50,8 +50,8 @@ class HRAAdaptive(object):
         self.beta_schedule = LinearSchedule(10 * 1000, initial_p = 0.2, final_p = 1.0)
 
 
-    def __del__(self):
-        self.summary.close()
+ #   def __del__(self):
+#        self.summary.close()
 
 
     def should_explore(self):

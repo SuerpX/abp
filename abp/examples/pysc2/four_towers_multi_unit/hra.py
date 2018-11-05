@@ -19,7 +19,7 @@ import numpy as np
 import pandas as pd
 import csv
 import json
-import imutil
+#import imutil
 
 def run_task(evaluation_config, network_config, reinforce_config):
     import absl
@@ -29,7 +29,7 @@ def run_task(evaluation_config, network_config, reinforce_config):
     # env = gym.make(evaluation_config.env)
     max_episode_steps = 100
     state = env.reset()
-    # print(state)
+    #print(state.shape)
     choices = [0,1,2,3]
     pdx_explanation = PDX()
 

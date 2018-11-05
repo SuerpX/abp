@@ -13,7 +13,7 @@ import pandas as pd
 import csv
 import json
 import visdom
-import imutil
+#import imutil
 
 import numpy as np
 import pysc2
@@ -175,6 +175,7 @@ class FourTowerSequential():
         ###########################################
         state = observation[3]['feature_screen']
         state = np.reshape(state, (1, -1))
+        
         #print('STATE SHAPE')
         #print(state.shape)
         #print(state.type)
