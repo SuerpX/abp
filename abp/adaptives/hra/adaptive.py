@@ -50,8 +50,8 @@ class HRAAdaptive(object):
         self.beta_schedule = LinearSchedule(10 * 1000, initial_p = 0.2, final_p = 1.0)
 
 
- #   def __del__(self):
-#        self.summary.close()
+    def __del__(self):
+        self.summary.close()
 
 
     def should_explore(self):
@@ -65,11 +65,14 @@ class HRAAdaptive(object):
 
     def predict(self, state):
         self.steps += 1
-
+ #       print(self.steps)
         if self.previous_state is not None and self.previous_action is not None:
+ #           print("l2:")
+ #           print(self.current_reward)
             self.replay_memory.add(self.previous_state, self.previous_action, self.reward_list(), state, False)
 
         if self.learning and self.should_explore():
+ #           print("explore:")
             action = np.random.choice(len(self.choices))
             q_values = [None] * len(self.choices)  # TODO should it be output shape or from choices?
             choice = self.choices[action]
@@ -80,6 +83,7 @@ class HRAAdaptive(object):
             choice = self.choices[action]
 
         if self.learning and self.steps % self.update_frequency == 0:
+ #           print("*********************update**************")
             logger.debug("Replacing target model for %s" % self.name)
             self.target_model.replace(self.eval_model)
 
@@ -101,6 +105,10 @@ class HRAAdaptive(object):
         self.learning = False
         self.episode = 0
 
+    def enable_learning(self):
+        self.learning = True
+        self.episode = 0
+
 
     def end_episode(self, state):
         if not self.learning:
@@ -113,7 +121,7 @@ class HRAAdaptive(object):
         self.summary.add_scalar(tag  = '%s/Episode Reward' % self.name,
                                     scalar_value = self.total_reward,
                                     global_step = self.episode)
-
+        
         self.replay_memory.add(self.previous_state, self.previous_action, self.reward_list(), state, True)
 
         self.clear_rewards()
@@ -144,15 +152,20 @@ class HRAAdaptive(object):
 
 
     def update(self):
+        
         if self.steps <= self.reinforce_config.batch_size:
             return
-
+        '''
+        if (self.steps + 1) % self.reinforce_config.batch_size !=0:
+            return
+        '''
         beta = self.beta_schedule.value(self.steps)
 
         self.summary.add_scalar(tag='%s/Beta' % self.name, scalar_value=beta, global_step=self.steps)
 
         states, actions, reward, next_states, is_terminal, weights, batch_idxes = self.replay_memory.sample(self.reinforce_config.batch_size, beta)
-        
+
+        #print(reward)
         states = Variable(torch.Tensor(states))
         next_states = Variable(torch.Tensor(next_states))
 
@@ -181,4 +194,6 @@ class HRAAdaptive(object):
 
         self.eval_model.fit(states, q_target, self.steps)
 
+ #       self.steps = 0
+ #       print(new_priorities)
         return td_errors

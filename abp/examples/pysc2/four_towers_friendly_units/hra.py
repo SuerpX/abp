@@ -94,7 +94,7 @@ def run_task(evaluation_config, network_config, reinforce_config):
             #time.sleep(0.5)
             state, done, dead = env.step(action)
             while running:
-                #action = 4
+                action = 4
                 state, done, dead = env.step(action)
                 if done:
                     break
@@ -103,6 +103,8 @@ def run_task(evaluation_config, network_config, reinforce_config):
                 rewards[rt] = env.decomposed_rewards[len(env.decomposed_rewards) - 1][i]
                 agent.reward(rt, rewards[rt])
                 total_reward += rewards[rt]
+ #           print("l1:")
+#            print(rewards)
  #           print(np.array(env.decomposed_rewards))
 #            print(rewards)
  #           time.sleep(15)
@@ -139,7 +141,7 @@ def run_task(evaluation_config, network_config, reinforce_config):
             action, q_values = agent.predict(np.array(state))
             print(action)
             print(q_values)
-            '''
+            
             if evaluation_config.render:
                 # env.render()
                 pdx_explanation.render_all_pdx(action, 4, q_values,
@@ -159,7 +161,7 @@ def run_task(evaluation_config, network_config, reinforce_config):
                                                 'penalty'])
                 
                 time.sleep(evaluation_config.sleep)
-            '''
+            
                 
             state, done, dead = env.step(action)
 
@@ -175,7 +177,7 @@ def run_task(evaluation_config, network_config, reinforce_config):
                 total_reward += env.decomposed_rewards[len(env.decomposed_rewards) - 1][i]
         
         total_rewwards_list.append(total_reward)
-            
+        
         agent.end_episode(np.array(state))
 
         test_summary_writer.add_scalar(tag="Test/Episode Reward", scalar_value=total_reward,

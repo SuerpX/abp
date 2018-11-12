@@ -9,7 +9,8 @@ from s2clientprotocol import sc2api_pb2 as sc_pb
 class FourTowerSequentialFriendlyUnits():
     def __init__(self):
  #       mapName = 'FoutTowersWithFridenlyUnits'
-        mapName = 'FoutTowersWithFridenlyUnitsFixedEnemies'
+ #       mapName = 'FoutTowersWithFridenlyUnitsFixedEnemies'
+        mapName = 'FoutTowersWithFridenlyUnitsFixedEnemiesFixedPosition'
         self.register_map('/maps/',mapName)
         self.sc2_env = sc2_env.SC2Env(
           map_name = mapName,
@@ -17,7 +18,7 @@ class FourTowerSequentialFriendlyUnits():
           agent_interface_format = features.AgentInterfaceFormat(
               feature_dimensions = features.Dimensions(screen = 40, minimap = 30),
               action_space = actions.ActionSpace.FEATURES,
-              camera_width_world_units = 26
+              camera_width_world_units = 28
               ),
           step_mul = 16,
           game_steps_per_episode = 0,
@@ -90,10 +91,12 @@ class FourTowerSequentialFriendlyUnits():
         np.set_printoptions(threshold=np.nan,linewidth=np.nan)
  #       print(observation)
         state = observation[3]['feature_screen']
-        
- #       print(state)
+        player_id = np.array(state[4])
+        player_id[np.array(state[6]) == 73] = 3
+        state[4] = player_id.tolist()
+        #print(state)
         state = np.reshape(state, (1, -1))
- #       print(state.shape)
+
         data = self.sc2_env._controllers[0]._client.send(observation = sc_pb.RequestObservation())
         self.sc2_env._controllers[0]._client.send(action = sc_pb.RequestAction())
 
@@ -199,7 +202,7 @@ class FourTowerSequentialFriendlyUnits():
                 action = actions.FUNCTIONS.no_op()
         else:
             action = actions.FUNCTIONS.no_op()
-            print("###############error")
+ #           print(self.actions_taken == 0, self.check_action(self.current_obs, 12))
    #     print(action)
         ####################
 
@@ -219,6 +222,9 @@ class FourTowerSequentialFriendlyUnits():
         rewards, sof = self.getRewards(data)
 
         state = observation[3]['feature_screen']
+        player_id = np.array(state[4])
+        player_id[np.array(state[6]) == 73] = 3
+        state[4] = player_id.tolist()
         state = np.reshape(state, (1, -1))
         #print(state.shape)
         self.decomposed_rewards_all.append([])
@@ -279,6 +285,7 @@ class FourTowerSequentialFriendlyUnits():
         return obs.observation.available_actions
 
     def check_action(self, obs, action):
+ #       print(action, self.get_available_actions)
         return action in self.get_available_actions(obs)
 
 
