@@ -33,6 +33,7 @@ class FourTowerSequentialFriendlyUnits():
         self.decomposed_rewards = []
         self.decomposed_rewards_mark = 0
         self.signal_of_finished = 1
+        self.last_state = None
 
         '''
         self.enemy_type_number_dict = {
@@ -96,6 +97,8 @@ class FourTowerSequentialFriendlyUnits():
         state[4] = player_id.tolist()
         #print(state)
         state = np.reshape(state, (1, -1))
+        self.last_state = None
+
 
         data = self.sc2_env._controllers[0]._client.send(observation = sc_pb.RequestObservation())
         self.sc2_env._controllers[0]._client.send(action = sc_pb.RequestAction())
@@ -226,6 +229,7 @@ class FourTowerSequentialFriendlyUnits():
         player_id[np.array(state[6]) == 73] = 3
         state[4] = player_id.tolist()
         state = np.reshape(state, (1, -1))
+
         #print(state.shape)
         self.decomposed_rewards_all.append([])
         for key in self.decomposed_reward_dict:
@@ -263,6 +267,8 @@ class FourTowerSequentialFriendlyUnits():
                 state.append(0.0)
 #        print(done,dead)
         '''
+        if not dead:
+            self.last_state = state
         return state, done, dead
 
     def register_map(self, map_dir, map_name):

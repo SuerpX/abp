@@ -39,8 +39,8 @@ class HRAAdaptive(object):
 
         self.total_reward = 0
 
-        self.eval_model = HRAModel(self.name + "_eval", self.network_config)
-        self.target_model = HRAModel(self.name + "_target", self.network_config)
+        self.eval_model = HRAModel(self.name + "_eval", self.network_config,learning_rate=0.0001)
+        self.target_model = HRAModel(self.name + "_target", self.network_config,learning_rate=0.0001)
 
         clear_summary_path(self.reinforce_config.summaries_path + "/" + self.name)
         self.summary = SummaryWriter(log_dir = self.reinforce_config.summaries_path + "/" + self.name)
@@ -64,11 +64,10 @@ class HRAAdaptive(object):
 
 
     def predict(self, state):
-        self.steps += 1
+        if self.learning:
+            self.steps += 1
  #       print(self.steps)
-        if self.previous_state is not None and self.previous_action is not None:
- #           print("l2:")
- #           print(self.current_reward)
+        if self.previous_state is not None and self.previous_action is not None and self.learning:
             self.replay_memory.add(self.previous_state, self.previous_action, self.reward_list(), state, False)
 
         if self.learning and self.should_explore():
@@ -86,9 +85,8 @@ class HRAAdaptive(object):
  #           print("*********************update**************")
             logger.debug("Replacing target model for %s" % self.name)
             self.target_model.replace(self.eval_model)
-
-
-        self.update()
+        if self.learning:
+            self.update()
 
         self.clear_rewards()
 
@@ -107,7 +105,6 @@ class HRAAdaptive(object):
 
     def enable_learning(self):
         self.learning = True
-        self.episode = 0
 
 
     def end_episode(self, state):
@@ -121,7 +118,7 @@ class HRAAdaptive(object):
         self.summary.add_scalar(tag  = '%s/Episode Reward' % self.name,
                                     scalar_value = self.total_reward,
                                     global_step = self.episode)
-        
+
         self.replay_memory.add(self.previous_state, self.previous_action, self.reward_list(), state, True)
 
         self.clear_rewards()
@@ -135,7 +132,7 @@ class HRAAdaptive(object):
     def reward_list(self):
         reward = [0] * len(self.reward_types)
 
-        for i, reward_type in enumerate(sorted(self.reward_types)):
+        for i, reward_type in enumerate(self.reward_types):
             reward[i] = self.current_reward[reward_type]
 
         return reward
@@ -164,8 +161,7 @@ class HRAAdaptive(object):
         self.summary.add_scalar(tag='%s/Beta' % self.name, scalar_value=beta, global_step=self.steps)
 
         states, actions, reward, next_states, is_terminal, weights, batch_idxes = self.replay_memory.sample(self.reinforce_config.batch_size, beta)
-
-        #print(reward)
+        
         states = Variable(torch.Tensor(states))
         next_states = Variable(torch.Tensor(next_states))
 

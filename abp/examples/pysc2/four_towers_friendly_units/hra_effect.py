@@ -70,10 +70,10 @@ def run_task(evaluation_config, network_config, reinforce_config):
         }
     
     all_rewards = []
-    for epoch in range(30):
+    for epoch in range(200):
         agent.enable_learning()
         print(epoch)
-        for episode in range(epoch):
+        for episode in range(20):
             state = env.reset()
             total_reward = 0
             done = False
@@ -115,7 +115,8 @@ def run_task(evaluation_config, network_config, reinforce_config):
             for i in range(len(totalRewardsDict)):
                 totalRewardsDict[list(totalRewardsDict.keys())[i]] += rewards[reward_types[i]]
 
-            agent.end_episode(np.array(state))
+            agent.end_episode(env.last_state)
+          #  print(env.last_state)
             test_summary_writer.add_scalar(tag = "Train/Episode Reward", scalar_value = total_reward,
                                            global_step = episode + 1)
             train_summary_writer.add_scalar(tag = "Train/Steps to choosing Enemies", scalar_value = steps + 1,
@@ -129,7 +130,7 @@ def run_task(evaluation_config, network_config, reinforce_config):
 
         total_rewwards_list = []
         # Test Episodes
-        for episode in range(2):
+        for episode in range(3):
             state = env.reset()
             total_reward = 0
             done = False
@@ -185,6 +186,7 @@ def run_task(evaluation_config, network_config, reinforce_config):
                                            global_step=episode + 1)
             test_summary_writer.add_scalar(tag="Test/Steps to choosing Enemies", scalar_value=steps + 1,
                                            global_step=episode + 1)
-        final_rewards = sum(total_rewwards_list) / evaluation_config.test_episodes
+        final_rewards = sum(total_rewwards_list) / 3
         all_rewards.append(final_rewards)
         print(final_rewards)
+    print(all_rewards)
