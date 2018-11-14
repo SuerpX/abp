@@ -29,6 +29,7 @@ class Model(object):
 
     def restore_network(self):
         if self.restore and self.network_config.restore_network and self.network_config.network_path:
+            print("restore")
             logger.info("Restoring network for %s " % self.name)
             self.model.load_state_dict(torch.load(self.model_path))
 

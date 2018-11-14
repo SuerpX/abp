@@ -23,7 +23,7 @@ class FourTowerSequentialFriendlyUnits():
           step_mul = 16,
           game_steps_per_episode = 0,
           score_index = 0,
-          visualize = True,)
+          visualize = False,)
  #       lib.renderer_human.zoom(1.5)
 
         

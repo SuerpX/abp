@@ -9,7 +9,7 @@ from abp.utils import clear_summary_path
 from abp.explanations import PDX
 from tensorboardX import SummaryWriter
 from gym.envs.registration import register
-from abp.openai.envs.four_towers_friendly_units.FourTowerSequentialFriendlyUnits import FourTowerSequentialFriendlyUnits
+from abp.openai.envs.four_towers_friendly_units.FourTowerSequentialFriendlyUnits_onehot import FourTowerSequentialFriendlyUnits
 
 def run_task(evaluation_config, network_config, reinforce_config):
 
@@ -73,7 +73,7 @@ def run_task(evaluation_config, network_config, reinforce_config):
     for epoch in range(200):
         agent.enable_learning()
         print(epoch)
-        for episode in range(20):
+        for episode in range(1):
             state = env.reset()
             total_reward = 0
             done = False

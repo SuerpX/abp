@@ -64,8 +64,8 @@ class HRAAdaptive(object):
 
 
     def predict(self, state):
-        if self.learning:
-            self.steps += 1
+ #       if self.learning:
+        self.steps += 1
  #       print(self.steps)
         if self.previous_state is not None and self.previous_action is not None and self.learning:
             self.replay_memory.add(self.previous_state, self.previous_action, self.reward_list(), state, False)
@@ -85,8 +85,8 @@ class HRAAdaptive(object):
  #           print("*********************update**************")
             logger.debug("Replacing target model for %s" % self.name)
             self.target_model.replace(self.eval_model)
-        if self.learning:
-            self.update()
+ #       if self.learning:
+        self.update()
 
         self.clear_rewards()
 
